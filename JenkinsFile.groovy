@@ -1,29 +1,30 @@
 pipeline {
-    agent any
+
+    environment {
+        registry = "mamohr/centos-java"
+        registryCredential = 'docker'
+    }
+    agent none
     stages {
-        stage('START') {
-            steps {
-                echo 'Hello!! World~!!!!'
-            }
-        }
-        /*
-        stage('Git Pull') {
-            steps {
-                echo "Git Pull"
-                git branch: 'master',
-                        credentialsId: 'Jenkins',
-                        url: 'https://github.com/haepyung/gradlebase.git'
-            }
-        }
-        */
         stage('Build') {
+            agent any
             steps {
                 echo "Build"
                 sh 'chmod +x ./gradlew'
                 sh('./gradlew build')
             }
         }
+
+        stage('Build docker ps') {
+            agent { dockerfile true }
+            steps {
+                    sh 'pwd'
+                    /*sh 'docker build -t mamohr/centos-java .'
+                    sh 'docker run -it --rm mamohr/centos-java'*/
+            }
+        }
     }
+
     //마지막 어떻게 할껀지
     post {
         always {
@@ -34,7 +35,4 @@ pipeline {
             //mail to: team@gmail.com, subject: 'Pipeline fail email'
         }
     }
-}
-pipeline {
-    /* insert Declarative Pipeline here */
 }
