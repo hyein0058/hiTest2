@@ -1,9 +1,4 @@
 pipeline {
-
-    environment {
-        registry = "mamohr/centos-java"
-        registryCredential = 'docker'
-    }
     agent none
     stages {
         stage('Build') {
@@ -16,11 +11,10 @@ pipeline {
         }
 
         stage('Build docker ps') {
-            agent { dockerfile true }
+            agent any
             steps {
-                    sh 'pwd'
-                    /*sh 'docker build -t mamohr/centos-java .'
-                    sh 'docker run -it --rm mamohr/centos-java'*/
+                sh 'docker build -t gradlet2 .'
+                sh 'docker run -d -p 8089:8089 gradlet2'
             }
         }
     }
@@ -29,6 +23,7 @@ pipeline {
     post {
         always {
             echo 'build done!!!!!'
+            slackSend color: "good", message: "FIN STEP: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         }
         failure {
             echo 'build Fail!!!!!'
